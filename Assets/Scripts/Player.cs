@@ -5,6 +5,14 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField]
+    private GameObject laserPrefab;
+
+    [SerializeField]
+    private float fireRate = 0.25f;
+
+    private float canFire = 0.0f;
+
+    [SerializeField]
     private float speed = 5.0f;
 
     // Start is called before the first frame update
@@ -16,7 +24,20 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        this.Movement();       
+        this.Movement();    
+        if(Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButton(0))
+        {
+            this.Shoot();
+        }
+    }
+
+    private void Shoot()
+    {
+        if (Time.time > canFire)
+        {
+            Instantiate(laserPrefab, transform.position + new Vector3(0, 0.9f, 0), Quaternion.identity);
+            canFire = Time.time + fireRate;
+        }
     }
 
     private void Movement()
