@@ -5,6 +5,8 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public bool canTripleShot = false;
+    public bool activateSpeedBoost = false;
+    public bool activateShield = false;
 
     [SerializeField]
     private GameObject tripleShotPrefab;
@@ -30,8 +32,8 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        this.Movement();    
-        if(Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButton(0))
+        this.Movement();
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButton(0))
         {
             this.Shoot();
         }
@@ -58,8 +60,9 @@ public class Player : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-        transform.Translate(Vector3.right * speed * horizontalInput * Time.deltaTime);
-        transform.Translate(Vector3.up * speed * verticalInput * Time.deltaTime);
+        float speedBoost = this.activateSpeedBoost ? 2.0f : 1;
+        transform.Translate(Vector3.right * (speed * speedBoost) * horizontalInput * Time.deltaTime);
+        transform.Translate(Vector3.up * (speed * speedBoost) * verticalInput * Time.deltaTime);
 
         if (transform.position.y > 0)
         {
@@ -80,15 +83,41 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void TripleShotPowerupOn()
+    // 0 = tripleshoot; 1 = speed boost; 2 = shield;
+    public void PowerupOn(int powerupID)
     {
-        canTripleShot = true;
-        StartCoroutine(TripleShootPowerDownRoutine());
+        switch(powerupID)
+        {
+            case 0:
+                canTripleShot = true;
+                break;
+            case 1:
+                activateSpeedBoost = true;
+                break;
+            case 2:
+                activateShield = true;
+                break;
+        }
+        StartCoroutine(PowerupDown(powerupID));
     }
 
-    public IEnumerator TripleShootPowerDownRoutine()
+    // 0 = tripleshoot; 1 = speed boost; 2 = shield;
+    public IEnumerator PowerupDown(int powerupID)
     {
         yield return new WaitForSeconds(5.0f);
-        canTripleShot = false;
+        switch (powerupID)
+        {
+            case 0:
+                canTripleShot = false;
+                break;
+            case 1:
+                activateSpeedBoost = false;
+                break;
+            case 2:
+                activateShield = false;
+                break;
+        }
+
     }
+  
 }
